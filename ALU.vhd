@@ -23,16 +23,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity ALU is
-    Port (  ALUCont : in STD_LOGIC_VECTOR (5 downto 0);
+    Port (  ALUCont : in STD_LOGIC_VECTOR (3 downto 0);
             A, B : in STD_LOGIC_VECTOR (31 downto 0);
-            ALUResult : out STD_LOGIC_VECTOR (31 downto 0);
+            ALUResult: out STD_LOGIC_VECTOR (31 downto 0);
             ovf, zero : out STD_LOGIC);
 end ALU;
 
 architecture Behavioral of ALU is
 
-    signal CO: STD_LOGIC_VECTOR (31 downto 0);
-    signal s, CIn : STD_LOGIC;
+    signal CO: STD_LOGIC_VECTOR (30 downto 0);
+    signal s, CIn1 : STD_LOGIC;
     
     component ALU_1bit
             Port (  op : in STD_LOGIC_VECTOR (1 downto 0);
@@ -49,19 +49,17 @@ architecture Behavioral of ALU is
 
 begin
 
-    s <= '0';
-    CIn <= '0';
-    Acont : process(ALUCont, CIn)
+    Acont : process(ALUCont)
     begin
         case ALUCont is
-            when "100110" => CIn <= '1';
-            when "100111" => CIn <= '1';
-            when others => CIn <= '0';
+            when "0110" => CIn1 <= '1';
+            when "0111" => CIn1 <= '1';
+            when others => CIn1 <= '0';
         end case;
     
     end process Acont;
     
-    A0: ALU_1bit port map (a => A(0), b => B(0), less => s, a_inv => ALUCont(3), b_inv => ALUCont(2) , CIn => CIn, op(1 downto 0) => ALUCont(1 downto 0), c_out => CO(0), result => ALUResult(0));
+    A0: ALU_1bit port map (a => A(0), b => B(0), less => s, a_inv => ALUCont(3), b_inv => ALUCont(2) , CIn => CIn1, op(1 downto 0) => ALUCont(1 downto 0), c_out => CO(0), result => ALUResult(0));
     A1: ALU_1bit port map (a => A(1), b => B(1), less => '0', a_inv => ALUCont(3), b_inv => ALUCont(2) , CIn => CO(0), op(1 downto 0) => ALUCont(1 downto 0), c_out => CO(1), result => ALUResult(1));
     A2: ALU_1bit port map (a => A(2), b => B(2), less => '0', a_inv => ALUCont(3), b_inv => ALUCont(2) , CIn => CO(1), op(1 downto 0) => ALUCont(1 downto 0), c_out => CO(2), result => ALUResult(2));
     A3: ALU_1bit port map (a => A(3), b => B(3), less => '0', a_inv => ALUCont(3), b_inv => ALUCont(2) , CIn => CO(2), op(1 downto 0) => ALUCont(1 downto 0), c_out => CO(3), result => ALUResult(3));

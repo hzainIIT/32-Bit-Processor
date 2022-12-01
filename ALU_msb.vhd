@@ -65,7 +65,7 @@ begin
     M1: mux2_1 port map (in1 => b, in2 => binv, sel => b_inv, o => w2);
     F0: full_adder port map (in0 => w1, in1 => w2, carryIn => CIn, sum => w3, carryOut => COut);
     
-    process(a, b, less, a_inv, b_inv, CIn, op)
+    process(a1, o1, less, w3)
         begin
         case op is
             when "00" => r <= a1;

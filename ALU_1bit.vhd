@@ -39,7 +39,7 @@ end ALU_1bit;
 
 architecture Behavioral of ALU_1bit is
 
-    signal ainv, binv, w1, w2, w3, COut, a1, o1, r: STD_LOGIC;
+    signal ainv, binv, w1, w2, w3, COut, a1, o1: STD_LOGIC;
 
     component mux2_1
         Port (  in1, in2, sel : in STD_LOGIC;
@@ -58,24 +58,25 @@ begin
 
     ainv <=  NOT a;
     binv <=  NOT b;
-    a1 <= w1 AND w2;
-    o1 <= w1 OR w2;
     
     M0: mux2_1 port map (in1 => a, in2 => ainv, sel => a_inv, o => w1);
     M1: mux2_1 port map (in1 => b, in2 => binv, sel => b_inv, o => w2);
-    F0: full_adder port map (in0 => w1, in1 => w2, carryIn => CIn, sum => w3, carryOut => COut);
     
-    process(a, b, less, a_inv, b_inv, CIn, op)
+    a1 <= w1 AND w2;
+    o1 <= w1 OR w2;
+
+    F0: full_adder port map (in0 => w1, in1 => w2, carryIn => CIn, sum => w3, carryOut => c_out);
+    
+    process(op, a1, o1, less, w3)
         begin
         case op is
-            when "00" => r <= a1;
-            when "01" => r <= o1;
-            when "10" => r <= w3;
-            when "11" => r <= less;
-            when others => r <= a1;
+            when "00" => result <= a1;
+            when "01" => result <= o1;
+            when "10" => result <= w3;
+            when "11" => result <= less;
+            when others => result <= '0';
         end case;
     end process;
-    
-    result <= r;
 
+    
 end Behavioral;

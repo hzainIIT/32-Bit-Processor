@@ -34,28 +34,29 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity ALUCntrl is
     Port (  FuncField : in STD_LOGIC_VECTOR (5 downto 0);
             ALUop : in STD_LOGIC_VECTOR (1 downto 0);
-            ALUCon : out STD_LOGIC_VECTOR (5 downto 0));
+            ALUCon : out STD_LOGIC_VECTOR (3 downto 0));
 end ALUCntrl;
 
 architecture Behavioral of ALUCntrl is
 
-    signal ALUC: STD_LOGIC_VECTOR (5 downto 0);
+    --signal ALUC: STD_LOGIC_VECTOR (3 downto 0);
     
     begin
         process(ALUop, FuncField)
         begin
             if ALUop = "00" then
-                ALUC <= "000010";
+                ALUCon <= "0010";
             elsif ALUop = "01" then
-                ALUC <= "000110";
+                ALUCon <= "0110";
             elsif ALUop = "00" then
                 case FuncField is
-                    when "000000" => ALUC <= "000010";
-                    when "000010" => ALUC <= "000110";
-                    when "000100" => ALUC <= "000000";
-                    when "000101" => ALUC <= "000111";
-                    when "000111" => ALUC <= "001100";
+                    when "000000" => ALUCon <= "0010";
+                    when "000010" => ALUCon <= "0110";
+                    when "000100" => ALUCon <= "0000";
+                    when "000101" => ALUCon <= "0111";
+                    when "000111" => ALUCon <= "1100";
                 end case;
             end if;
          end process;
+         
 end Behavioral;
