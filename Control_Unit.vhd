@@ -31,21 +31,75 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+-- dont need to worry about enable - allow Instruction_Decode to worry about that
 entity Control_Unit is
     Port ( Opcode : in STD_LOGIC_VECTOR (5 downto 0);
-           RegWrite : out STD_LOGIC;
-           MemtoReg : out STD_LOGIC;
-           BranchEn : out STD_LOGIC;
-           MemRead : out STD_LOGIC;
-           MemWrite : out STD_LOGIC;
-           RegDst : out STD_LOGIC;
-           ALUOP : out STD_LOGIC_VECTOR (3 downto 0);
-           ALUSrc : out STD_LOGIC);
+            -- reg_write[1], MemtoReg[0]
+           WBControl : out STD_LOGIC_VECTOR (1 downto 0);
+           -- JumpEn[3], BranchEn[2], MemRead[1], MemWrite[0]
+           MEMControl : out STD_LOGIC_VECTOR (3 downto 0);
+           -- ALUOp[3:2], RegDst[1], ALUSrc[0]
+           EXControl : out STD_LOGIC_VECTOR (3 downto 0)
+          ); 
 end Control_Unit;
 
+--Must Decode for:
+    -- normal RTYPE
+    -- lw
+    -- sw
+    -- jump
+    -- addi
 architecture Behavioral of Control_Unit is
 
 begin
+process (Opcode) begin
+    -- set everything to zero
+    WBControl <= (others => '0');
+    MEMControl <= (others => '0');
+    EXControl <= (others => '0');
+    
+    
+--             -- reg_write[1], MemtoReg[0]
+--           WBControl : out STD_LOGIC_VECTOR (1 downto 0);
+--           -- BranchEn[2], MemRead[1], MemWrite[0]
+--           MEMControl : out STD_LOGIC_VECTOR (2 downto 0);
+--           -- ALUOp[3:2], RegDst[1], ALUSrc[0]
+--           EXControl : out STD_LOGIC_VECTOR (3 downto 0)
+    case Opcode is
+        when "000000" => --Regtype 
+            WBControl <= "10";
+            MEMControl <= "000";
+            EXControl <= "1010";
 
-
-end Behavioral;
+        when "100011" => --lw 
+            WBControl <= "11";
+            MEMControl <= "0010";
+            EXControl <= "0001";
+            
+         when "101011" => --sw 
+            WBControl <= "00";
+            MEMControl <= "0001";
+            EXControl <= "0001";
+            
+         when "000010" => --jump (what needs to be cleared for this to go off in mem)
+            WBControl <= "00";
+            MEMControl <= "1000";
+            EXControl <= "0000";
+            
+        when "0010000" => --addi 
+            WBControl <= "10";
+            MEMControl <= "0000";
+            EXControl <= "0";
+            
+        when "0010000" => --addl (RCA)
+            WBControl <= "10";
+            MEMControl <= "0000";
+            EXControl <= "0";
+            
+        when "101011" => --SLT
+            WBControl <= "00";
+            MEMControl <= "0001";
+            EXControl <= "0001";
+    end case;
+ end process; 
+ end Behavioral;
