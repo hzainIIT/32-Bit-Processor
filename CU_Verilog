@@ -1,0 +1,135 @@
+/*
+This file contains all the modules for the Control Unit.
+The Control Unit uses the instruction to generate various control signals.
+*/
+ 
+/* Control Unit
+   Input: op, clk
+   Output: pc_write_cond, pc_write, i_or_d, mem_read, mem_write, mem_to_reg, ir_write, reg_write, reg_dst, alu_src_a,
+       	alu_src_b, pc_source, alu_op
+*/
+module MainControlUnit (
+    input [5:0] op,
+    output reg reg_write, alu_src, reg_dst, mem_read, mem_write, mem_to_reg, branch,
+    [1:0] alu_op);
+
+   parameter r_type = 6'b000000, addi = 6'b001000, lw = 6'b100011, sw = 6'b101011, jump = 6'b000010, beq = 6'b000100;
+   
+   	always @(op)
+       	begin
+           	case(op)
+                r_type:
+                    begin
+                        reg_write   <= 1'b1;    // Write to Register
+                        alu_src     <= 1'b0;    // ALU Src is Read Data 2
+                        reg_dst     <= 1'b1;    // Destination Reg Comes from Inst[15:11]   
+                        mem_read    <= 1'b0;    // Not Reading from Memory
+                        mem_write   <= 1'b0;    // Not Writing to Memory
+                        mem_to_reg  <= 1'b1;    // Route ALU Result back to Write Data
+                        branch      <= 1'b0;    // Not Branching
+                        alu_op      <= 2'b10;   // Funct field is used to determine the ALU control signal settings
+                    end
+
+                addi:
+                    begin
+                        reg_write   <= 1'b1;    // Write to Register
+                        alu_src     <= 1'b1;    // ALU Src is Immediate Data
+                        reg_dst     <= 1'b0;    // Destination Reg Comes from Inst[20:16]  
+                        mem_read    <= 1'b0;    // Not Reading from Memory
+                        mem_write   <= 1'b0;    // Not Writing to Memory
+                        mem_to_reg  <= 1'b1;    // Route ALU Result back to Write Data
+                        branch      <= 1'b0;    // Not Branching
+                        alu_op      <= 2'b00;   // ALU Operation Add
+                    end
+
+                lw:
+                    begin
+                        reg_write   <= 1'b1;    // Write to Register
+                        alu_src     <= 1'b1;    // ALU Src is Immediate Data
+                        reg_dst     <= 1'b0;    // Destination Reg Comes from Inst[20:16]   
+                        mem_read    <= 1'b1;    // Reading from Memory
+                        mem_write   <= 1'b0;    // Not Writing to Memory
+                        mem_to_reg  <= 1'b0;    // Reading from Memory
+                        branch      <= 1'b0;    // Not Branching
+                        alu_op      <= 2'b00;   // ALU Operation Add
+                    end
+
+                sw:
+                    begin
+                        reg_write   <= 1'b0;    // Write to Memory, not Register
+                        alu_src     <= 1'b1;    // ALU Src is Immediate Data
+                        reg_dst     <= 1'b0;    // Destination Reg Comes from Inst[20:16]   
+                        mem_read    <= 1'b0;    // Not Reading from Memory
+                        mem_write   <= 1'b1;    // Writing to Memory
+                        mem_to_reg  <= 1'b1;    // Not Reading from Memory
+                        branch      <= 1'b0;    // Not Branching
+                        alu_op      <= 2'b00;   // ALU Operation Add
+                    end
+
+                jump:
+                    begin
+                        reg_write   <= 1'b0;    // No write
+                        alu_src     <= 1'b0;    // ALU Src is Immediate Data
+                        reg_dst     <= 1'b0;    // Destination Reg Comes from Inst[20:16]   
+                        mem_read    <= 1'b0;    // Not Reading from Memory
+                        mem_write   <= 1'b0;    // Not Writing to Memory
+                        mem_to_reg  <= 1'b1;    // Not Reading from Memory
+                        branch      <= 1'b1;    // Branching
+                        alu_op      <= 2'b00;   // ALU Operation Add
+                    end
+
+                beq:
+                    begin
+                        reg_write   <= 1'b0;    // No write
+                        alu_src     <= 1'b0;    // ALU Src is Immediate Data
+                        reg_dst     <= 1'b0;    // Destination Reg Comes from Inst[20:16]   
+                        mem_read    <= 1'b0;    // Not Reading from Memory
+                        mem_write   <= 1'b0;    // Not Writing to Memory
+                        mem_to_reg  <= 1'b1;    // Not Reading from Memory
+                        branch      <= 1'b1;    // Branching
+                        alu_op      <= 2'b01;   // ALU Operation Sub
+                    end
+            endcase
+        end
+endmodule
+ 
+ 
+/* Control Unit Test Bench
+Cycles through the instructions to verify the values at the control signals are correct
+*/
+module MainControlUnit_tb;
+reg [5:0] op;
+reg clk;
+ 
+wire reg_write, alu_src, reg_dst, mem_read, mem_write, mem_to_reg, branch;
+wire [1:0] alu_op;
+ 
+localparam period = 10;
+always #(period/2) clk =~clk;
+initial begin
+   clk 	<= 0;
+   op  	<= 6'b000000;   // R-Type
+   #period
+   op  	<= 6'b100011;   // LW
+   #period
+   op  	<= 6'b001000;   // addi
+   #period
+   op  	<= 6'b101011;   // SW
+   #period
+   op  	<= 6'b000010;   // J
+   #period
+   op  	<= 6'b000000;   // Initial State (Makes things easier to read on the simulation output)
+end
+
+MainControlUnit UUT(    .clk           	(clk),
+                        .op         	(op),
+                        .reg_write      (reg_write),
+                        .alu_src   	    (alu_src),
+                        .reg_dst     	(reg_dst),
+                        .mem_read   	(mem_read),
+                        .mem_write  	(mem_write),
+                        .mem_to_reg 	(mem_to_reg),
+                        .branch   	    (branch),
+                        .alu_op  	    (alu_op)    );
+ 
+endmodule 
