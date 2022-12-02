@@ -36,15 +36,15 @@ entity Control_Unit is
     Port ( Opcode : in STD_LOGIC_VECTOR (5 downto 0);
             -- reg_write[1], MemtoReg[0]
            WBControl : out STD_LOGIC_VECTOR (1 downto 0);
-           -- JumpEn[3], BranchEn[2], MemRead[1], MemWrite[0]
-           MEMControl : out STD_LOGIC_VECTOR (3 downto 0);
+           -- JumpEn[2], MemRead[1], MemWrite[0]
+           MEMControl : out STD_LOGIC_VECTOR (2 downto 0);
            -- ALUOp[3:2], RegDst[1], ALUSrc[0]
            EXControl : out STD_LOGIC_VECTOR (3 downto 0)
           ); 
 end Control_Unit;
 
 --Must Decode for:
-    -- normal RTYPE
+    -- RTYPE
     -- lw
     -- sw
     -- jump
@@ -58,13 +58,6 @@ process (Opcode) begin
     MEMControl <= (others => '0');
     EXControl <= (others => '0');
     
-    
---             -- reg_write[1], MemtoReg[0]
---           WBControl : out STD_LOGIC_VECTOR (1 downto 0);
---           -- BranchEn[2], MemRead[1], MemWrite[0]
---           MEMControl : out STD_LOGIC_VECTOR (2 downto 0);
---           -- ALUOp[3:2], RegDst[1], ALUSrc[0]
---           EXControl : out STD_LOGIC_VECTOR (3 downto 0)
     case Opcode is
         when "000000" => --Regtype 
             WBControl <= "10";
@@ -73,33 +66,24 @@ process (Opcode) begin
 
         when "100011" => --lw 
             WBControl <= "11";
-            MEMControl <= "0010";
+            MEMControl <= "010";
             EXControl <= "0001";
             
          when "101011" => --sw 
             WBControl <= "00";
-            MEMControl <= "0001";
+            MEMControl <= "001";
             EXControl <= "0001";
             
          when "000010" => --jump (what needs to be cleared for this to go off in mem)
             WBControl <= "00";
-            MEMControl <= "1000";
+            MEMControl <= "100";
             EXControl <= "0000";
             
         when "0010000" => --addi 
             WBControl <= "10";
-            MEMControl <= "0000";
-            EXControl <= "0";
-            
-        when "0010000" => --addl (RCA)
-            WBControl <= "10";
-            MEMControl <= "0000";
-            EXControl <= "0";
-            
-        when "101011" => --SLT
-            WBControl <= "00";
-            MEMControl <= "0001";
+            MEMControl <= "000";
             EXControl <= "0001";
+            
     end case;
  end process; 
  end Behavioral;
