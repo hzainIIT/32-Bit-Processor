@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer: Alex Maliwat
 -- 
 -- Create Date: 12/01/2022 09:18:55 AM
 -- Design Name: 
@@ -37,7 +37,9 @@ use IEEE.NUMERIC_STD.ALL;
 --TODO things for forwarding
 --
 entity Instruction_Decode is
-    Port ( Instruction : in STD_LOGIC_VECTOR (31 downto 0);
+    Port ( 
+           CLK : in STD_LOGIC; -- TODO
+           Instruction : in STD_LOGIC_VECTOR (31 downto 0);
            PCCarry : inout STD_LOGIC; -- this is not st logic FIXXXXXXXX
            WriteReg : in STD_LOGIC_VECTOR (4 downto 0);
            WriteData: in STD_LOGIC_VECTOR (31 downto 0);
@@ -92,7 +94,6 @@ begin
 -- output rd and rt
 RD <= rd_decoded;
 RT <= rt_decoded;
-SECarry(15 downto 0) <= Instruction(15 downto 0);
 SECarry <= std_logic_vector(resize(signed(Imm), SECarry'length));
 
 
