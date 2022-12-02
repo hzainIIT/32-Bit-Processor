@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 12/01/2022 07:24:50 PM
+-- Create Date: 12/01/2022 06:16:08 PM
 -- Design Name: 
--- Module Name: Adder - Behavioral
+-- Module Name: EX - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -17,28 +17,6 @@
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
-
---
--- Sumador convencional. Usado en las etapas etapas IF y EX. 
---
--- Licencia: Copyright 2008 Emmanuel Luján
---
--- 	This program is free software; you can redistribute it and/or
--- 	modify it under the terms of the GNU General Public License as
--- 	published by the Free Software Foundation; either version 2 of
--- 	the License, or (at your option) any later version. This program
--- 	is distributed in the hope that it will be useful, but WITHOUT
--- 	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
--- 	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
--- 	License for more details. You should have received a copy of the
--- 	GNU General Public License along with this program; if not, write
--- 	to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
--- 	Boston, MA 02110-1301 USA.
--- 
--- Autor:	Emmanuel Luján
--- Email:	info@emmanuellujan.com.ar
--- Versión:	1.0
---
  
 library ieee;
 use ieee.STD_LOGIC_1164.all;
