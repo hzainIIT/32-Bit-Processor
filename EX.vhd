@@ -32,17 +32,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity EX is
-    Port (  ALUsrc, RegDst : STD_LOGIC;
-            ALUopin : in STD_LOGIC_VECTOR (1 downto 0);
-            Inst2, Inst3 : in STD_LOGIC_VECTOR (4 downto 0);
-            PCadr, RD1, RD2, Inst1 : in STD_LOGIC_VECTOR (31 downto 0);
-            ovfin, zeroin : out STD_LOGIC;
+    Port (  ExOp : in STD_LOGIC_VECTOR (3 downto 0);
+            Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
+            --JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
+            PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
+            ovfin, zeroin, JumpEn : out STD_LOGIC;
             RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
             ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
 end EX;
 
 architecture Behavioral of EX is
 
+    signal RegDst, ALUsrc : STD_LOGIC;
+    signal ALUOpin : STD_LOGIC_VECTOR (1 downto 0);
     signal ALUconout : STD_LOGIC_VECTOR (3 downto 0);
     signal ALUIn, Shiftp, OffShift : STD_LOGIC_VECTOR (31 downto 0);
     signal CAux, ALUcontOut	: STD_LOGIC;
@@ -56,8 +58,8 @@ architecture Behavioral of EX is
     component ALU is
             Port (  ALUCont : in STD_LOGIC_VECTOR (3 downto 0);
                     A, B : in STD_LOGIC_VECTOR (31 downto 0);
-                    ALUResult: out STD_LOGIC_VECTOR (31 downto 0);
-                    ovf, zero : out STD_LOGIC);
+                    ALUResult : out STD_LOGIC_VECTOR (31 downto 0);
+                    ovf : out STD_LOGIC);
     end component ALU;
     
     component Adder is
@@ -72,29 +74,35 @@ architecture Behavioral of EX is
     
 begin
 
-    OffShift <= Inst1(29 downto 0) & "00";
+    RegDst <= ExOp(1);
+    ALUsrc <= ExOp(0);
+    ALUOpin <= ExOp(3 downto 2);
+    JumpEn <= '0';
+
+    OffShift <= "00000000000000000000000000000100";
     
-    ALUC :  ALUCntrl port map(FuncField => Inst1(5 downto 0), ALUop => ALUOpin, ALUCon => ALUConout);
+    ALUC :  ALUCntrl port map(FuncField => SigCarry(5 downto 0), ALUop => ALUOpin, ALUCon => ALUConout);
     A1 :    Adder port map(CIN => '0', X => PCadr, Y => OffShift, COUT => CAux, R => PCaddout);
-    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, zero => zeroin, ovf => ovfin, ALUResult => ALUr);
+    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, ovf => ovfin, ALUResult => ALUr);
     
     MUX_Inst:
-		process(RegDst, Inst2, Inst3) is
+		process(RegDst, Rt, Rd) is
     		begin
     	 		if( RegDst = '0') then
-    	 			RD2Out <= Inst2; 
+    	 			RegdstOut <= Rt; 
 	    	 	else
-    		 		RD2Out <= Inst3;
+    		 		RegdstOut <= Rd;
     		 	end if;
     	 end process;
     	 
     MUX_EX:
-		process(ALUsrc, Inst1, RD2) is
+		process(ALUsrc, SigCarry, RD2) is
     		begin
     	 		if( ALUsrc = '0') then
     	 			ALUIn <= RD2; 
 	    	 	else
-    		 		ALUIn <= Inst1;
+    		 		ALUIn <= SigCarry;
+    		 		RD2Out <= RD2;
     		 	end if;
     	 end process;
 
