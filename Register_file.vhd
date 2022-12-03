@@ -54,7 +54,7 @@ architecture Behavioral of Register_file is
 begin
 
 --write before read
-process (regfile, RS, ReadReg2) begin
+process (regfile, RS, ReadReg2, WriteReg, WriteData, RegWriteControl) begin
     if Reset = '1' then
         regfile(0) <= "00000000000000000000000000000001";
         regfile(1) <= "00000000000000000000000000000010";
@@ -91,7 +91,6 @@ process (regfile, RS, ReadReg2) begin
     
     elsif RegWriteControl = '1' then
         regfile(to_integer(unsigned(WriteReg))) <= WriteData;
---        regfile(0) <= "10000000000000000000000000000000";
     end if;
     ReadData1 <= regfile(to_integer(unsigned(RS)));
     ReadData2 <= regfile(to_integer(unsigned(ReadReg2)));
