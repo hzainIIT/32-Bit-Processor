@@ -36,10 +36,10 @@ entity Control_Unit is
     Port ( Opcode : in STD_LOGIC_VECTOR (5 downto 0);
             -- reg_write[1], MemtoReg[0]
            WBControl : out STD_LOGIC_VECTOR (1 downto 0);
-           -- JumpEn[2], MemRead[1], MemWrite[0]
-           MEMControl : out STD_LOGIC_VECTOR (2 downto 0);
-           -- ALUOp[3:2], RegDst[1], ALUSrc[0]
-           EXControl : out STD_LOGIC_VECTOR (3 downto 0)
+           -- , MemRead[1], MemWrite[0]
+           MEMControl : out STD_LOGIC_VECTOR (1 downto 0);
+           -- PCSRC[5], JumpEn[4], ALUOp[3:2], RegDst[1], ALUSrc[0]
+           EXControl : out STD_LOGIC_VECTOR (5 downto 0)
           ); 
 end Control_Unit;
 
@@ -61,29 +61,32 @@ process (Opcode) begin
     case Opcode is
         when "000000" => --Regtype 
             WBControl <= "10";
-            MEMControl <= "000";
-            EXControl <= "1010";
+            MEMControl <= "00";
+            EXControl <= "001010";
 
         when "100011" => --lw 
             WBControl <= "11";
-            MEMControl <= "010";
-            EXControl <= "0001";
+            MEMControl <= "10";
+            EXControl <= "000001";
             
          when "101011" => --sw 
             WBControl <= "00";
-            MEMControl <= "001";
-            EXControl <= "0001";
+            MEMControl <= "01";
+            EXControl <= "000001";
             
          when "000010" => --jump (what needs to be cleared for this to go off in mem)
             WBControl <= "00";
-            MEMControl <= "100";
-            EXControl <= "0000";
+            MEMControl <= "00";
+            EXControl <= "110000";
             
-        when "0010000" => --addi 
+        when "001000" => --addi 
             WBControl <= "10";
-            MEMControl <= "000";
-            EXControl <= "0001";
-            
+            MEMControl <= "00";
+            EXControl <= "000001";
+        when others =>
+            WBControl <= "XX";
+            MEMControl <= "XX";
+            EXControl <= "XXXXXX";
     end case;
  end process; 
  end Behavioral;

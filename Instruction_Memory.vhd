@@ -78,6 +78,8 @@ process (PCAddress) begin
 			when "00000000000000000010010100000000" => --2500
               -- make it break
               Instruction <= "00000000000000000000000000000000";
+            when others =>
+               Instruction <= "00000000000000000000000000000000";
     end case;
 end process;
 

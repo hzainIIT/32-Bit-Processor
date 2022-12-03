@@ -31,25 +31,26 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
---TODO initial implement of R type, sw, lw, add1
---TODO stalls
---TODO jump (just need to set some to nop and get to 2500 asap)
---TODO things for forwarding
---
+--TODO jump send cntrl signal to ex
+-- TODO send 26 bit jump adder to ex
+
+
 entity Instruction_Decode is
     Port ( 
-           CLK : in STD_LOGIC; -- TODO
+--           CLK : in STD_LOGIC; -- TODO
+           Reset : STD_LOGIC;
            Instruction : in STD_LOGIC_VECTOR (31 downto 0);
-           PCCarry : inout STD_LOGIC; -- this is not st logic FIXXXXXXXX
+--           PCCarry : inout STD_LOGIC_VECTOR (31 downto 0);
            WriteReg : in STD_LOGIC_VECTOR (4 downto 0);
            WriteData: in STD_LOGIC_VECTOR (31 downto 0);
            RegWriteControl: in STD_LOGIC;
            -- reg_write[1], MemtoReg[0]
            WBControl : out STD_LOGIC_VECTOR (1 downto 0); --size subject to change
-           -- ALUOp[3:2], RegDst[1], ALUSrc[0]
-           EXControl : out STD_LOGIC_VECTOR (3 downto 0); --size subject to change
-           -- JumpEn[2], MemRead[1], MemWrite[0]
-           MEMControl : out STD_LOGIC_VECTOR (2 downto 0); --size subject to change
+           -- PCsrc[5] JumpEn[4] ALUOp[3:2], RegDst[1], ALUSrc[0]
+           EXControl : out STD_LOGIC_VECTOR (5 downto 0); --size subject to change
+           -- , MemRead[1], MemWrite[0]
+           MEMControl : out STD_LOGIC_VECTOR (1 downto 0); --size subject to change
+           jumpaddr : out STD_LOGIC_VECTOR (25 downto 0);
            RD : out STD_LOGIC_VECTOR (4 downto 0);
            RT : out STD_LOGIC_VECTOR (4 downto 0);
            SECarry: out STD_LOGIC_VECTOR (31 downto 0); --includes funct for R and IMM for I
@@ -71,14 +72,15 @@ component Control_Unit
             -- reg_write[1], MemtoReg[0]
            WBControl : out STD_LOGIC_VECTOR (1 downto 0);
            -- JumpEn[2], MemRead[1], MemWrite[0]
-           MEMControl : out STD_LOGIC_VECTOR (2 downto 0);
+           MEMControl : out STD_LOGIC_VECTOR (1 downto 0);
            -- ALUOp[3:2], RegDst[1], ALUSrc[0]
-           EXControl : out STD_LOGIC_VECTOR (3 downto 0)
+           EXControl : out STD_LOGIC_VECTOR (5 downto 0)
     );
 end component;
 
 component Register_file
     port(
+        Reset : in STD_LOGIC;
         RS : in STD_LOGIC_VECTOR (4 downto 0);
         ReadReg2 : in STD_LOGIC_VECTOR (4 downto 0);
         WriteReg : in STD_LOGIC_VECTOR (4 downto 0);
@@ -95,9 +97,10 @@ begin
 RD <= rd_decoded;
 RT <= rt_decoded;
 SECarry <= std_logic_vector(resize(signed(Imm), SECarry'length));
-
+jumpaddr <=  Instruction(25 downto 0);
 
 reg_file_entity: Register_file port map (
+    Reset => Reset,
     RS => rs_decoded,
     ReadReg2 => rt_decoded,
     WriteReg => WriteReg,

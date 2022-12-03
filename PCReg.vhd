@@ -32,10 +32,10 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 entity PCReg is
-    Port ( CLK : in STD_LOGIC;
-           Reset : in STD_LOGIC;
-           PCIn : in STD_LOGIC;
-           PCOut : out STD_LOGIC
+    Port ( --CLK : in STD_LOGIC;
+--           Reset : in STD_LOGIC;
+           PCIn : in STD_LOGIC_VECTOR (31 downto 0);
+           PCOut : out STD_LOGIC_VECTOR (31 downto 0)
     );
 end PCReg;
 
@@ -43,9 +43,9 @@ architecture Behavioral of PCReg is
 
 begin
 SYNCH_PCREG:
-    process(CLK, Reset, PCIn) begin
-        if rising_edge(CLK) then
+    process( PCIn) begin
+--        if rising_edge(CLK) then
             PCOut <= PCIn;
-        end if;
+--        end if;
     end process;
 end Behavioral;

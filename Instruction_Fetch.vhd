@@ -33,31 +33,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity Instruction_Fetch is
     port(
-        CLK : in std_logic;
-        PCSrc : in std_logic;
+        --CLK : in std_logic;
         NewPC : in std_logic_vector(31 downto 0);
-        IncPC : out std_logic_vector(31 downto 0);
+        PCCarry : out std_logic_vector(31 downto 0);
         Instruction : out std_logic_vector(31 downto 0)
     );
 end Instruction_Fetch;
 
 architecture Behavioral of Instruction_Fetch is
 
-component full_adder is --use full adder from project 2
-    port ( carryIn : in STD_LOGIC;
-           in0 : in STD_LOGIC;
-           in1 : in STD_LOGIC;
-           sum : out STD_LOGIC;
-           carryOut : out STD_LOGIC
-     );
-     
-end component full_adder;
-
 component PCReg is
-    port ( CLK : in STD_LOGIC;
-           Reset : in STD_LOGIC;
-           PCIn : in STD_LOGIC;
-           PCOut : out STD_LOGIC
+    port ( --CLK : in STD_LOGIC;
+--           Reset : in STD_LOGIC;
+           PCIn : in STD_LOGIC_VECTOR (31 downto 0);
+           PCOut : out STD_LOGIC_VECTOR (31 downto 0)
     );
 end component PCReg;
 
@@ -74,7 +63,20 @@ end component Instruction_Memory;
 --           InstRegOut : out STD_LOGIC_VECTOR (31 downto 0)
 --     );
 --end component IFIDBuffer;
+
+signal PCReg_out : STD_LOGIC_VECTOR (31 downto 0);
+
 begin
 
+PCReg_entity : PCReg port map (
+    PCIn => NewPC,
+    PCOut => PCReg_out
+);
 
+IM_entity: Instruction_Memory port map (
+    PCAddress => PCReg_out,
+    Instruction => Instruction
+);
+
+PCCarry <= PCReg_out;
 end Behavioral;
