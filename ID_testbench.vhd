@@ -78,7 +78,7 @@ signal ID_WriteReg_in : STD_LOGIC_VECTOR (4 downto 0) := (others => '0');
 signal ID_WriteData_in : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
 signal ID_RegWriteControl_in : STD_LOGIC := '0';
 -- reg_write[1], MemtoReg[0]
-signal ID_WBControl_out : STD_LOGIC_VECTOR (1 downto 0); 
+signal ID_WBControl_out : STD_LOGIC_VECTOR (1 downto 0) := (others => '0'); 
 -- PCsrc[5] JumpEn[4] ALUOp[3:2], RegDst[1], ALUSrc[0]
 signal ID_EXControl_out : STD_LOGIC_VECTOR (5 downto 0);
 -- , MemRead[1], MemWrite[0]
@@ -125,34 +125,70 @@ induv_stim_proc : process
     constant cc : time := 10 ps;
     begin 
     -- set up reg file
-    wait for cc;
+--    wait for cc;
     ID_reset <= '0';
     
     -- test instruction fetch
 --    wait for cc;
---    IF_PC_in <= "00000000000000000000000000000000";
+    IF_PC_in <= "00000000000000000000000000000000"; --00
 --    wait for cc;
---    ID_Instruction_in <=IF_Instruction_out;
+    ID_Instruction_in <=IF_Instruction_out;
 --    ID_WriteReg_in <= ID_RD_out;
     
---    wait for cc;
---    IF_PC_in <= "00000000000000000000000000000100";
---    wait for cc;
---    ID_Instruction_in <= IF_instruction_out;
-
---    wait for cc;
---    IF_PC_in <= "00000000000000000000000000001000";
---    wait for cc;
---    ID_Instruction_in <= IF_instruction_out;
-    
---    wait for cc;
---    IF_PC_in <= "00000000000000000000000000100100";
---    wait for cc;
---    ID_Instruction_in <= IF_instruction_out;
     wait for cc;
-    ID_RegWriteControl_in <= '1';
-    ID_WriteReg_in <= "00000";
-    ID_WriteData_in <= "10000000000000000000000000000000";
+    IF_PC_in <= "00000000000000000000000000000100"; --04
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000001000"; --08
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+    
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000001100"; --0c
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+    
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000010000"; --10
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+    
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000010100"; --14
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+        
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000011000"; --18
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+        
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000011100"; --1c
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+        
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000100000"; --20
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;    
+    
+    wait for cc;
+    IF_PC_in <= "00000000000000000000000000100100"; --24
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+        
+    wait for cc;
+    IF_PC_in <= "00000000000000000010010100000000"; --28
+--    wait for cc;
+    ID_Instruction_in <= IF_instruction_out;
+        
+--    wait for cc;
+--    ID_RegWriteControl_in <= '1';
+--    ID_WriteReg_in <= "00000";
+--    ID_WriteData_in <= "10000000000000000000000000000000";
     
 end process;
 
