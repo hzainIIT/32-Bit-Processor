@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 12/02/2022 08:35:11 PM
+-- Create Date: 12/05/2022 01:11:23 AM
 -- Design Name: 
--- Module Name: ID_testbench - Behavioral
+-- Module Name: IF_EX - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -31,10 +31,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity ID_testbench is
-end ID_testbench;
+entity IF_EX is
+--  Port ( );
+end IF_EX;
 
-architecture Behavioral of ID_testbench is
+architecture Behavioral of IF_EX is
 
 component Instruction_Fetch is
     port(
@@ -71,6 +72,22 @@ component Instruction_Decode is
            ReadData1 : out STD_LOGIC_VECTOR (31 downto 0);
            ReadData2 : out STD_LOGIC_VECTOR (31 downto 0));
 end component Instruction_Decode;
+
+component EX is
+    Port (  
+            ExOp : in STD_LOGIC_VECTOR (3 downto 0);
+            Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
+            JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
+            PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
+            zeroin, JumpEn : out STD_LOGIC;
+            RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
+            ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
+end component EX;
+
+signal ALU_Result : std_logic_vector (31 downto 0);
+signal Reg2 : std_logic_vector (31 downto 0);
+signal Ex_PC_Out : std_logic_vector (31 downto 0);
+signal Regdst_Out : std_logic_vector (4 downto 0);
 
 signal ID_reset : STD_LOGIC := '1';
 signal ID_Instruction_in : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
@@ -119,6 +136,22 @@ IDStage: Instruction_Decode port map (
    SECarry => ID_SignExt_out,
    ReadData1 => ID_ReadData1_out,
    ReadData2 => ID_ReadData2_out
+);
+
+TestEx : EX port map(   
+    ExOp => ID_EXControl_out(3 downto 0),
+    Rt => ID_RT_out,
+    Rd => ID_RD_out,
+    PCadr => IF_PC_out,
+    RD1 => ID_ReadData1_out,
+    RD2 => ID_ReadData2_out,
+    SigCarry => ID_SignExt_out,
+    JumpAdr => ID_jumpaddr_out,
+    JumpEn => ID_EXControl_out(4),
+    RegdstOut => Regdst_Out, 
+    ALUr => ALU_Result,
+    RD2Out => Reg2,
+    PCaddout => Ex_PC_Out
 );
 
 induv_stim_proc : process

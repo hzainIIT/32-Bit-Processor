@@ -34,9 +34,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity EX is
     Port (  ExOp : in STD_LOGIC_VECTOR (3 downto 0);
             Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
-            --JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
+            JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
             PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
-            ovfin, zeroin, JumpEn : out STD_LOGIC;
+            zeroin, JumpEn : out STD_LOGIC;
             RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
             ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
 end EX;
@@ -83,7 +83,7 @@ begin
     
     ALUC :  ALUCntrl port map(FuncField => SigCarry(5 downto 0), ALUop => ALUOpin, ALUCon => ALUConout);
     A1 :    Adder port map(CIN => '0', X => PCadr, Y => OffShift, COUT => CAux, R => PCaddout);
-    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, ovf => ovfin, ALUResult => ALUr);
+    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, ovf => JumpEn, ALUResult => ALUr);
     
     MUX_Inst:
 		process(RegDst, Rt, Rd) is

@@ -41,9 +41,9 @@ architecture Behavioral of EX_tb2 is
     component EX is
     Port (  ExOp : in STD_LOGIC_VECTOR (3 downto 0);
             Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
-            --JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
+            JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
             PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
-            ovfin, zeroin, JumpEn : out STD_LOGIC;
+            zeroin, JumpEn : out STD_LOGIC;
             RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
             ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
     end component EX;
@@ -51,9 +51,10 @@ architecture Behavioral of EX_tb2 is
     signal ExOpin : STD_LOGIC_VECTOR (3 downto 0);
     signal Rtin, Rdin : STD_LOGIC_VECTOR (4 downto 0);
     signal PCadrin, RD1in, RD2in, SigCarryin, Instruction : STD_LOGIC_VECTOR (31 downto 0);
-    signal ovfin, JumpEn : STD_LOGIC;
+    signal JumpEn : STD_LOGIC;
     signal RegdstOut : STD_LOGIC_VECTOR (4 downto 0);
     signal ALUr, RD2Out, PCaddout : STD_LOGIC_VECTOR (31 downto 0);
+    signal JumpAddrin : STD_LOGIC_VECTOR (25 downto 0);
 
 begin
 
@@ -64,8 +65,8 @@ begin
                             RD1 => RD1in,
                             RD2 => RD2in,
                             SigCarry => SigCarryin,
-                            ovfin => ovfin,
                             JumpEn => Jumpen,
+                            JumpAdr =>JumpAddrin, 
                             RegdstOut => RegdstOut, 
                             ALUr => ALUr,
                             RD2Out => RD2Out,
@@ -88,14 +89,14 @@ stim_proc : process
     
     wait for cc;
     
-    Instruction <= "00000010010100100100100000101010";
-    ExOpin <= "1010";
-    Rtin <= "10010";
-    Rdin <= "01001";
+    Instruction <= "00000010001100111001000000100010";
+    ExOpin <= "0000";
+    Rtin <= "00100";
+    Rdin <= "00000";
     PCadrin <= "11011110101011011011111011101111";
-    RD1in <= "00010001000100010001000100010001";  --11111111
-    RD2in <= "00100010001000100010001000100010";  --22222222
-    SigCarryin <= "00000000000000000100100000101010";
+    RD1in <= "00000000000000000000000000000001";  --11111111
+    RD2in <= "00000000000000000000000000000011";  --22222222
+    SigCarryin <= "00000000000000000100100000100010";
  
     wait for cc;
     end process;

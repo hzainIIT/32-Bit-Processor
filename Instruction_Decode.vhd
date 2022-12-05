@@ -96,7 +96,7 @@ begin
 -- output rd and rt
 RD <= rd_decoded;
 RT <= rt_decoded;
-SECarry <= std_logic_vector(resize(signed(Imm), SECarry'length));
+SECarry <= std_logic_vector(resize(signed(funct), SECarry'length));
 jumpaddr <=  Instruction(25 downto 0);
 
 reg_file_entity: Register_file port map (
