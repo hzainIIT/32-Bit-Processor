@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -36,7 +37,8 @@ entity EX is
             Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
             JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
             PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
-            zeroin, JumpEn : out STD_LOGIC;
+            JumpEn : in STD_LOGIC;
+            zeroin : out STD_LOGIC;
             RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
             ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
 end EX;
@@ -46,7 +48,7 @@ architecture Behavioral of EX is
     signal RegDst, ALUsrc : STD_LOGIC;
     signal ALUOpin : STD_LOGIC_VECTOR (1 downto 0);
     signal ALUconout : STD_LOGIC_VECTOR (3 downto 0);
-    signal ALUIn, Shiftp, OffShift : STD_LOGIC_VECTOR (31 downto 0);
+    signal ALUIn, Shiftp, OffShift, PCinc: STD_LOGIC_VECTOR (31 downto 0);
     signal CAux, ALUcontOut	: STD_LOGIC;
     
     component ALUCntrl is
@@ -77,13 +79,12 @@ begin
     RegDst <= ExOp(1);
     ALUsrc <= ExOp(0);
     ALUOpin <= ExOp(3 downto 2);
-    JumpEn <= '0';
 
     OffShift <= "00000000000000000000000000000100";
     
     ALUC :  ALUCntrl port map(FuncField => SigCarry(5 downto 0), ALUop => ALUOpin, ALUCon => ALUConout);
-    A1 :    Adder port map(CIN => '0', X => PCadr, Y => OffShift, COUT => CAux, R => PCaddout);
-    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, ovf => JumpEn, ALUResult => ALUr);
+    --A1 :    Adder port map(CIN => '0', X => PCadr, Y => OffShift, COUT => CAux, R => PCinc);
+    ALU1 :  ALU port map(ALUCont => ALUConout, A => RD1, B=> ALUIn, ovf => zeroin, ALUResult => ALUr);
     
     MUX_Inst:
 		process(RegDst, Rt, Rd) is
@@ -105,5 +106,13 @@ begin
     		 		RD2Out <= RD2;
     		 	end if;
     	 end process;
+    	 
+    process(JumpEn, JumpAdr, PCadr) is begin
+        if JumpEn = '1' then
+            PCaddout <= "0000" & JumpAdr & "00";
+        else
+            PCaddout <= PCadr + OffShift;
+        end if;
+    end process;
 
 end Behavioral;

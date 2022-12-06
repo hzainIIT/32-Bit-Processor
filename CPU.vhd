@@ -31,11 +31,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity IF_EX is
+entity IF_Mem is
 --  Port ( );
-end IF_EX;
+end IF_Mem;
 
-architecture Behavioral of IF_EX is
+architecture Behavioral of IF_Mem is
 
 component Instruction_Fetch is
     port(
@@ -79,16 +79,15 @@ component EX is
             Rt, Rd : in STD_LOGIC_VECTOR (4 downto 0);
             JumpAdr : in STD_LOGIC_VECTOR (25 downto 0);
             PCadr, RD1, RD2, SigCarry : in STD_LOGIC_VECTOR (31 downto 0);
-            JumpEn : in STD_LOGIC;
-            zeroin : out STD_LOGIC;
+            zeroin, JumpEn : out STD_LOGIC;
             RegdstOut: out STD_LOGIC_VECTOR (4 downto 0);
             ALUr, RD2Out, PCaddout : out STD_LOGIC_VECTOR (31 downto 0));
 end component EX;
 
-signal EX_ALU_Result : std_logic_vector (31 downto 0);
-signal EX_Reg2Out : std_logic_vector (31 downto 0);
+signal ALU_Result : std_logic_vector (31 downto 0);
+signal Reg2 : std_logic_vector (31 downto 0);
 signal Ex_PC_Out : std_logic_vector (31 downto 0);
-signal EX_Regdst_Out : std_logic_vector (4 downto 0);
+signal Regdst_Out : std_logic_vector (4 downto 0);
 
 signal ID_reset : STD_LOGIC := '1';
 signal ID_Instruction_in : STD_LOGIC_VECTOR (31 downto 0) := (others => '0');
@@ -108,6 +107,24 @@ signal ID_SignExt_out: STD_LOGIC_VECTOR (31 downto 0);
 signal ID_ReadData1_out : STD_LOGIC_VECTOR (31 downto 0);
 signal ID_ReadData2_out : STD_LOGIC_VECTOR (31 downto 0);
 
+component MEM is
+    Port (  Memwritein, Memreadin, rst : STD_LOGIC;
+            ALUR, RD2 : in STD_LOGIC_VECTOR (31 downto 0);
+            RD : out STD_LOGIC_VECTOR (31 downto 0));
+end component MEM;
+
+signal Mem_RD_Out : STD_LOGIC_VECTOR (31 downto 0);
+
+component Write_Back is
+    Port ( WBControl : in STD_LOGIC_VECTOR (1 downto 0);
+           MemIn : in STD_LOGIC_VECTOR (31 downto 0);
+           ALUIn : in STD_LOGIC_VECTOR (31 downto 0);
+           DataOut : out STD_LOGIC_VECTOR (31 downto 0);
+           RegWrite : out STD_LOGIC);
+end component Write_Back;
+
+signal WB_DataOut : STD_LOGIC_VECTOR (31 downto 0);
+signal WB_RegWrite : STD_LOGIC;
 
 begin
 -- Instantiate IF stage
@@ -149,11 +166,29 @@ TestEx : EX port map(
     SigCarry => ID_SignExt_out,
     JumpAdr => ID_jumpaddr_out,
     JumpEn => ID_EXControl_out(4),
-    RegdstOut => EX_Regdst_Out, 
-    ALUr => EX_ALU_Result,
-    RD2Out => EX_Reg2Out,
+    RegdstOut => Regdst_Out, 
+    ALUr => ALU_Result,
+    RD2Out => Reg2,
     PCaddout => Ex_PC_Out
 );
+
+TestMem : MEM port map(
+    Memwritein => ID_MEMControl_out(0),
+    Memreadin => ID_MEMControl_out(1),
+    rst => ID_reset,
+    ALUr => ALU_Result,
+    RD2 => Reg2,
+    RD => Mem_RD_Out
+);
+
+TestWB : Write_Back port map(
+    WBControl => ID_WBControl_out,
+    MemIn => Mem_RD_Out,
+    ALUin => ALU_Result,
+    DataOut => WB_DataOut,
+    RegWrite => WB_RegWrite
+);
+    
 
 induv_stim_proc : process
     constant cc : time := 10 ps;

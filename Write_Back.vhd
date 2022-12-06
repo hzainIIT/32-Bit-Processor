@@ -36,20 +36,23 @@ entity Write_Back is
            MemIn : in STD_LOGIC_VECTOR (31 downto 0);
            ALUIn : in STD_LOGIC_VECTOR (31 downto 0);
            DataOut : out STD_LOGIC_VECTOR (31 downto 0);
-           PCSrc : out STD_LOGIC);
+           RegWrite : out STD_LOGIC);
 end Write_Back;
 
 architecture Behavioral of Write_Back is
-alias memtoreg is WBControl(1);
+
+alias memtoreg is WBControl(0);
+
 begin
-PCSrc <= WBControl(0);
+
+RegWrite <= WBControl(1);
 
 --memToReg 0 writes mem to reg
 --memToReg 1 write ALU out to reg
 
 process (memtoreg, MemIn, ALUIn) begin
 
-if memtoreg = '0' then
+if memtoreg = '1' then
     DataOut <= MemIn;
 else
     DataOut <= ALUIn;

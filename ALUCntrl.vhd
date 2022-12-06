@@ -48,11 +48,12 @@ architecture Behavioral of ALUCntrl is
                 ALUCon <= "0110";
             elsif ALUop = "00" then
                 case FuncField is
-                    when "000000" => ALUCon <= "0010";
+                    when "100100" => ALUCon <= "0000"; -- and
+                    when "100101" => ALUCon <= "0001"; -- or
                     when "100010" => ALUCon <= "0110"; -- sub
-                    when "000100" => ALUCon <= "0000";
-                    when "000101" => ALUCon <= "0111";
-                    when "000111" => ALUCon <= "1100";
+                    when "100000" => ALUCon <= "0010"; -- add1
+                    when "100111" => ALUCon <= "1100"; -- nor
+                    when "101010" => ALUCon <= "0111"; -- slt
                     when others => ALUCon <= "0010";
                 end case;
             end if;

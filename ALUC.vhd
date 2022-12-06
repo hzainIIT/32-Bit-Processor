@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 12/01/2022 09:43:48 PM
+-- Create Date: 12/05/2022 12:44:50 PM
 -- Design Name: 
--- Module Name: MEM - Behavioral
+-- Module Name: ALUC - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -31,24 +31,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity MEM is
-    Port (  Memwritein, Memreadin, rst : STD_LOGIC;
-            ALUR, RD2 : in STD_LOGIC_VECTOR (31 downto 0);
-            RD : out STD_LOGIC_VECTOR (31 downto 0));
-end MEM;
+entity ALUC is
+--  Port ( );
+end ALUC;
 
-architecture Behavioral of MEM is
-    
-    component Datamem is
-        Port (  Memwrite, Memread, rst : STD_LOGIC;
-                Addr, WriteData : in STD_LOGIC_VECTOR (31 downto 0);
-                Read : out STD_LOGIC_VECTOR (31 downto 0));
-    end component Datamem;
-    
-    --anda <= branch AND zero AND Bout;
-    
+architecture Behavioral of ALUC is
+
 begin
 
-    dmem1 : Datamem port map(Memwrite => Memwritein, Memread => Memreadin, rst => rst, Addr => ALUR, WriteData => RD2, Read => RD);
 
 end Behavioral;

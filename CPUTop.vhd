@@ -31,11 +31,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity IF_EX is
+entity CPUTop is
 --  Port ( );
-end IF_EX;
+end CPUTop;
 
-architecture Behavioral of IF_EX is
+architecture Behavioral of CPUTop is
 
 component Instruction_Fetch is
     port(
@@ -87,7 +87,7 @@ end component EX;
 
 signal EX_ALU_Result : std_logic_vector (31 downto 0);
 signal EX_Reg2Out : std_logic_vector (31 downto 0);
-signal Ex_PC_Out : std_logic_vector (31 downto 0);
+signal EX_PC_Out : std_logic_vector (31 downto 0);
 signal EX_Regdst_Out : std_logic_vector (4 downto 0);
 
 signal ID_reset : STD_LOGIC := '1';
@@ -108,6 +108,24 @@ signal ID_SignExt_out: STD_LOGIC_VECTOR (31 downto 0);
 signal ID_ReadData1_out : STD_LOGIC_VECTOR (31 downto 0);
 signal ID_ReadData2_out : STD_LOGIC_VECTOR (31 downto 0);
 
+component MEM is
+    Port (  Memwritein, Memreadin, rst : STD_LOGIC;
+            ALUR, RD2 : in STD_LOGIC_VECTOR (31 downto 0);
+            RD : out STD_LOGIC_VECTOR (31 downto 0));
+end component MEM;
+
+signal Mem_RD_Out : STD_LOGIC_VECTOR (31 downto 0);
+
+component Write_Back is
+    Port ( WBControl : in STD_LOGIC_VECTOR (1 downto 0);
+           MemIn : in STD_LOGIC_VECTOR (31 downto 0);
+           ALUIn : in STD_LOGIC_VECTOR (31 downto 0);
+           DataOut : out STD_LOGIC_VECTOR (31 downto 0);
+           RegWrite : out STD_LOGIC);
+end component Write_Back;
+
+signal WB_DataOut : STD_LOGIC_VECTOR (31 downto 0);
+signal WB_RegWrite : STD_LOGIC;
 
 begin
 -- Instantiate IF stage
@@ -152,8 +170,26 @@ TestEx : EX port map(
     RegdstOut => EX_Regdst_Out, 
     ALUr => EX_ALU_Result,
     RD2Out => EX_Reg2Out,
-    PCaddout => Ex_PC_Out
+    PCaddout => EX_PC_Out
 );
+
+TestMem : MEM port map(
+    Memwritein => ID_MEMControl_out(0),
+    Memreadin => ID_MEMControl_out(1),
+    rst => ID_reset,
+    ALUr => EX_ALU_Result,
+    RD2 => EX_Reg2Out,
+    RD => Mem_RD_Out
+);
+
+TestWB : Write_Back port map(
+    WBControl => ID_WBControl_out,
+    MemIn => Mem_RD_Out,
+    ALUin => EX_ALU_Result,
+    DataOut => WB_DataOut,
+    RegWrite => WB_RegWrite
+);
+    
 
 induv_stim_proc : process
     constant cc : time := 10 ps;

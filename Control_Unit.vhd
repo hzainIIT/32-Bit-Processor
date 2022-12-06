@@ -62,7 +62,7 @@ process (Opcode) begin
         when "000000" => --Regtype 
             WBControl <= "10";
             MEMControl <= "00";
-            EXControl <= "001010";
+            EXControl <= "000010";
 
         when "100011" => --lw 
             WBControl <= "11";

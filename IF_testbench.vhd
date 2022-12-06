@@ -62,10 +62,10 @@ IFStage: Instruction_Fetch port map (
 
 -- stim proc
 stim_proc : process
-    constant cc: time := 10 ns;
+    constant cc: time := 10 ps;
     begin
     -- fetch first instruction
-    wait for cc;
+--    wait for cc;
     PCin <= "00000000000000000000000000000000";
     
     wait for cc;
@@ -75,13 +75,40 @@ stim_proc : process
     
     wait for cc;
     
-    -- fetch 4th instruction
+    -- fetch 3rd instruction
+    PCin <= "00000000000000000000000000001000";
+    
+    wait for cc;
+    
     PCin <= "00000000000000000000000000001100";
     
     wait for cc;
     
-    -- fetch 1st instruction again
-    PCin <= "00000000000000000000000000000000";
+    PCin <= "00000000000000000000000000010000";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000000000000010100";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000000000000011000";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000000000000011100";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000000000000100000";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000000000000100100";
+    
+    wait for cc;
+    
+    PCin <= "00000000000000000010010100000000";
     end process;
 
 end Behavioral;
